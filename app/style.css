@@ -1,0 +1,44 @@
+.logo {
+  background: url('freshdesk_logo.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  height: 25px;
+  margin-top: 25px;
+}
+
+hr {
+  border-color: #343a40;  
+}
+
+.order {
+  margin-top: 3px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border-width: 5px;
+  border-color: black;
+}
+
+
+
+.orderListing {
+font-family: bio-sans, sans-serif;
+color: black;
+}
+
+.orderRow {
+ font-family: bio-sans, sans-serif;
+ padding-left: 6px;
+ padding-bottom: 3px;
+ margin-left: 5px;
+ border-bottom: 2px;
+ border-radius: 2px;
+ box-shadow: 0 0 5px grey;
+}
+
+.hyperlink {
+  color: #343a40;
+}
+
+.hyperlink:hover {
+  color: #53b89c;
+}
