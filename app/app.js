@@ -55,7 +55,7 @@ createOrderList = () => {
                     `<div class=links>
                         <p> 
                             <b>Bestelling:</b>  
-                            <a href=#bestelnummer-${i}>${item.increment_id}</a> 
+                            <a href=#bestelnummer-${i}>${item.increment_id}</a>
                         <br> 
                         </p>
                     </div>`
@@ -66,6 +66,8 @@ createOrderList = () => {
         }
         
         while (parsedResponseM.items[i]) {
+            var purchaseDate = parsedResponseM.items[i].created_at.split(' ', 1);
+
             $(".orderList").append(
                 `<div class=orderM>
                     <div class=algemeen>
@@ -74,6 +76,9 @@ createOrderList = () => {
                         <p>
                             <b>Bestelnummer: </b><br>
                             <a href="https://vonroc.com/admin_8yhl9t/sales/order/view/order_id/${parsedResponseM.items[i].entity_id}" target="_blank" id=ordernummer>#${parsedResponseM.items[i].increment_id}</a>
+                            <br><br>
+                            <b>Besteldatum: </b><br>
+                            ${purchaseDate}
                         </p>    
                     </div>
 
@@ -117,7 +122,6 @@ createOrderList = () => {
         );
     }
 };
-
 
 //VV Beta functions VV
 
