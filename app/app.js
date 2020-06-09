@@ -1,11 +1,11 @@
 const BASE_URL_1 = "<%= iparam.url1 %>/rest/V1/orders?searchCriteria[filterGroups][0][filters][0][field]=customer_email&searchCriteria[filterGroups][0][filters][0][conditionType]=eq&searchCriteria[filterGroups][1][filters][0][field]=status&searchCriteria[filterGroups][1][filters][0][value]=Complete&searchCriteria[filterGroups][1][filters][0][conditionType]=in&searchCriteria[filterGroups][0][filters][0][value]=";
 const BASE_URL_2 = "<%= iparam.url2 %>/rest/V1/orders?searchCriteria[filterGroups][0][filters][0][field]=customer_email&searchCriteria[filterGroups][0][filters][0][conditionType]=eq&searchCriteria[filterGroups][1][filters][0][field]=status&searchCriteria[filterGroups][1][filters][0][value]=Complete&searchCriteria[filterGroups][1][filters][0][conditionType]=in&searchCriteria[filterGroups][0][filters][0][value]=";
+
 $(document).ready(() => {
     app.initialized().then(
         function(_client) {
         client = _client;
         client.events.on('app.activated', () => {
-            console.log("app activated")
             getNewList()
         });
     });
@@ -37,8 +37,6 @@ getUser = email => {
 
     client.request[method](url, options).then(data => {
         parsedResponseM = JSON.parse(data.response);
-        console.log(parsedResponseM)
-        // createQuicklist(i)
         createOrderList() 
     })  
 };
