@@ -21,12 +21,12 @@ getNewList = () => {
 
 getContactData = client => {
     client.data.get('contact').then(data => {
-        var userEmail = data.contact.email;
-        getUser(userEmail);
+        getUser(data);
     })
 };
 
-getUser = email => {
+getUser = (clientData) => {
+    var email = clientData.contact.email;
     var method = "get";
     var url = BASE_URL_1 + email;
     var options = {
@@ -36,19 +36,20 @@ getUser = email => {
     }}
 
     client.request[method](url, options).then(data => {
-        parsedResponseM = JSON.parse(data.response);
-        createOrderList() 
-    })  
+        parsedData = JSON.parse(data.response);
+        createOrderList(clientData, parsedData)
+    })
+    
 };
 
-createOrderList = () => {
+createOrderList = (clientData, data) => {
     var i = 0
-    if (parsedResponseM.items.length !== 0){
-        if (parsedResponseM.items.length > 1) {
+    if (data.items.length !== 0){
+        if (data.items.length > 1) {
             $(".quickListTitle").append(
                 `<h2 id="title"><b>Snel Zoeken</b></h2>`            
             )
-            parsedResponseM.items.forEach(item => {
+            data.items.forEach(item => {
                 $(".quickListBody").append(
                     `<div class=links>
                         <p> 
@@ -63,8 +64,11 @@ createOrderList = () => {
             i = 0
         }
         
-        while (parsedResponseM.items[i]) {
-            var purchaseDate = parsedResponseM.items[i].created_at.split(' ', 1);
+        while (data.items[i]) {
+            var purchaseDateView = data.items[i].created_at.split(' ', 1).toString().reverse().join('-') //fix this bug
+            var purchaseDate = Date.parse(data.items[i].created_at.split(' ', 1)) / 1000;
+            var requestDate = Date.parse(clientData.contact.created_at.split('T',1)) / 1000;
+            var warrantyDate = purchaseDate + 63113852
 
             $(".orderList").append(
                 `<div class=orderM>
@@ -73,14 +77,19 @@ createOrderList = () => {
                         <br>
                         <p>
                             <b>Bestelnummer: </b><br>
-                            <a href="https://vonroc.com/admin_8yhl9t/sales/order/view/order_id/${parsedResponseM.items[i].entity_id}" target="_blank" id=ordernummer>#${parsedResponseM.items[i].increment_id}</a>
+                            <a href="https://vonroc.com/admin_8yhl9t/sales/order/view/order_id/${data.items[i].entity_id}" target="_blank" id=ordernummer>#${data.items[i].increment_id}</a>
                             <br><br>
                             <b>Besteldatum: </b><br>
-                            ${purchaseDate}
+                            ${purchaseDateView} <br>
+                            <div>
+                            <p id="garantieControle"><b>Klant heeft recht op garantie:</b><br></p>
+                            <div>
                         </p>    
                     </div>
 
-                    <div class=verzending>
+                    <div class="fw-divider"></div>
+                
+                    <div class="Verzending">
                         <h3>Verzending</h3>
                         <p id=dpd>
                             <b>Track & Trace:</b> <br>
@@ -88,28 +97,39 @@ createOrderList = () => {
                         </p>
                     </div>
 
+                    <div class="fw-divider"></div>
+
                     <div id=betaling>
                         <h3>Betaling</h3>
                         <p><b>Betalingskenmerk:</b>
-                            <a href="https://ca-live.adyen.com/ca/ca/accounts/showTx.shtml?txType=Payment&pspReference=${parsedResponseM.items[i].payment.cc_trans_id}" target="_blank">${parsedResponseM.items[i].payment.cc_trans_id}</a>
+                            <a href="https://ca-live.adyen.com/ca/ca/accounts/showTx.shtml?txType=Payment&pspReference=${data.items[i].payment.cc_trans_id}" target="_blank">${data.items[i].payment.cc_trans_id}</a>
                         </p>
                         <p>
                             <b>Bedrag exclusief BTW:</b> <br>
-                            <i>€${parsedResponseM.items[i].base_subtotal}</i>
+                            <i>€${data.items[i].base_subtotal}</i>
                         </p>
                         <p>
                             <b>BTW:</b> <br>
-                            <i>€${parsedResponseM.items[i].base_tax_amount}</i>
+                            <i>€${data.items[i].base_tax_amount}</i>
                         </p>
                         <p>
                             <b>Bedrag inclusief BTW:</b> <br>
-                            <i>€${parsedResponseM.items[i].base_subtotal_incl_tax}</i>
+                            <i>€${data.items[i].base_subtotal_incl_tax}</i>
                         </p>
                     </div>
                 <a href="#anchorpoint-top">Terug naar boven</a>
                 <hr>
                 </div>`
             );
+
+            if (warrantyDate < requestDate) {
+                $("#garantieControle").append(`
+                <p style="color:red"><b>Nee</b></p>`);
+            } else {
+                $("#garantieControle").append(`
+                <p style="color:green"><b>Ja</b></p>`);
+            }
+
             i++ 
         }    
     } else {
