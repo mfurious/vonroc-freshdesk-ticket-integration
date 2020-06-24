@@ -1,77 +1,81 @@
-const BASE_URL_1 = "<%= iparam.url1 %>/rest/V1/orders?searchCriteria[filterGroups][0][filters][0][field]=customer_email&searchCriteria[filterGroups][0][filters][0][conditionType]=eq&searchCriteria[filterGroups][1][filters][0][field]=status&searchCriteria[filterGroups][1][filters][0][value]=Complete&searchCriteria[filterGroups][1][filters][0][conditionType]=in&searchCriteria[filterGroups][0][filters][0][value]=";
-const BASE_URL_2 = "<%= iparam.url2 %>/rest/V1/orders?searchCriteria[filterGroups][0][filters][0][field]=customer_email&searchCriteria[filterGroups][0][filters][0][conditionType]=eq&searchCriteria[filterGroups][1][filters][0][field]=status&searchCriteria[filterGroups][1][filters][0][value]=Complete&searchCriteria[filterGroups][1][filters][0][conditionType]=in&searchCriteria[filterGroups][0][filters][0][value]=";
+const BASE_URL_1 =
+  "<%= iparam.url1 %>/rest/V1/orders?searchCriteria[filterGroups][0][filters][0][field]=customer_email&searchCriteria[filterGroups][0][filters][0][conditionType]=eq&searchCriteria[filterGroups][1][filters][0][field]=status&searchCriteria[filterGroups][1][filters][0][value]=Complete&searchCriteria[filterGroups][1][filters][0][conditionType]=in&searchCriteria[filterGroups][0][filters][0][value]=";
+const BASE_URL_2 =
+  "<%= iparam.url2 %>/rest/V1/orders?searchCriteria[filterGroups][0][filters][0][field]=customer_email&searchCriteria[filterGroups][0][filters][0][conditionType]=eq&searchCriteria[filterGroups][1][filters][0][field]=status&searchCriteria[filterGroups][1][filters][0][value]=Complete&searchCriteria[filterGroups][1][filters][0][conditionType]=in&searchCriteria[filterGroups][0][filters][0][value]=";
 
 $(document).ready(() => {
-    app.initialized().then(
-        function(_client) {
-        client = _client;
-        client.events.on('app.activated', () => {
-            getNewList()
-        });
+  app.initialized().then(function (_client) {
+    client = _client;
+    client.events.on("app.activated", () => {
+      getNewList();
     });
+  });
 });
 
-getNewList = () => { 
-    $(".links").remove();
-    $("#title").remove();
-    $(".orderM").remove();
-    getContactData(client);
+getNewList = () => {
+  $(".links").remove();
+  $("#title").remove();
+  $(".orderM").remove();
+  getContactData(client);
+};
 
-}
-
-getContactData = client => {
-    client.data.get('contact').then(data => {
-        getUser(data);
-    })
+getContactData = (client) => {
+  client.data.get("contact").then((data) => {
+    getUser(data);
+  });
 };
 
 getUser = (clientData) => {
-    var email = clientData.contact.email;
-    var method = "get";
-    var url = BASE_URL_1 + email;
-    var options = {
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": 'Bearer <%= iparam.a %>'
-    }}
+  var email = clientData.contact.email;
+  var method = "get";
+  var url = BASE_URL_1 + email;
+  var options = {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer <%= iparam.a %>",
+    },
+  };
 
-    client.request[method](url, options).then(data => {
-        parsedData = JSON.parse(data.response);
-        createOrderList(clientData, parsedData)
-    })
-    
+  client.request[method](url, options).then((data) => {
+    parsedData = JSON.parse(data.response);
+    createOrderList(clientData, parsedData);
+  });
 };
 
 createOrderList = (clientData, data) => {
-    var i = 0
-    if (data.items.length !== 0){
-        if (data.items.length > 1) {
-            $(".quickListTitle").append(
-                `<h2 id="title"><b>Snel Zoeken</b></h2>`            
-            )
-            data.items.forEach(item => {
-                $(".quickListBody").append(
-                    `<div class=links>
+  var i = 0;
+  if (data.items.length !== 0) {
+    if (data.items.length > 1) {
+      $(".quickListTitle").append(`<h2 id="title"><b>Snel Zoeken</b></h2>`);
+      data.items.forEach((item) => {
+        $(".quickListBody").append(
+          `<div class=links>
                         <p> 
                             <b>Bestelling:</b>  
                             <a href=#bestelnummer-${i}>${item.increment_id}</a>
                         <br> 
                         </p>
                     </div>`
-                ) 
-            i++
-            });
-            i = 0
-        }
-        
-        while (data.items[i]) {
-            var purchaseDateView = data.items[i].created_at.split(' ', 1).toString().reverse().join('-') //fix this bug
-            var purchaseDate = Date.parse(data.items[i].created_at.split(' ', 1)) / 1000;
-            var requestDate = Date.parse(clientData.contact.created_at.split('T',1)) / 1000;
-            var warrantyDate = purchaseDate + 63113852
+        );
+        i++;
+      });
+      i = 0;
+    }
 
-            $(".orderList").append(
-                `<div class=orderM>
+    while (data.items[i]) {
+      console.log(data);
+      var purchaseDateView = data.items[i].created_at
+        .split(" ", 1)
+        .reverse()
+        .join("-"); //fix this bug
+      var purchaseDate =
+        Date.parse(data.items[i].created_at.split(" ", 1)) / 1000;
+      var requestDate =
+        Date.parse(data.items[i].created_at.split("T", 1)) / 1000;
+      var warrantyDate = purchaseDate + 63113852;
+
+      $(".orderList").append(
+        `<div class=orderM>
                     <div class=algemeen>
                         <h2 id=bestelnummer-${i}>Bestelling:</h2>
                         <br>
@@ -82,7 +86,7 @@ createOrderList = (clientData, data) => {
                             <b>Besteldatum: </b><br>
                             ${purchaseDateView} <br>
                             <div>
-                            <p id="garantieControle"><b>Klant heeft recht op garantie:</b><br></p>
+                            <p id="garantieControle${i}"><b>Klant heeft recht op garantie:</b><br></p>
                             <div>
                         </p>    
                     </div>
@@ -120,29 +124,28 @@ createOrderList = (clientData, data) => {
                 <a href="#anchorpoint-top">Terug naar boven</a>
                 <hr>
                 </div>`
-            );
+      );
 
-            if (warrantyDate < requestDate) {
-                $("#garantieControle").append(`
+      if (warrantyDate < requestDate) {
+        $(`#garantieControle${i}`).append(`
                 <p style="color:red"><b>Nee</b></p>`);
-            } else {
-                $("#garantieControle").append(`
+      } else {
+        $(`#garantieControle${i}`).append(`
                 <p style="color:green"><b>Ja</b></p>`);
-            }
+      }
 
-            i++ 
-        }    
-    } else {
-        $(".orderList").append(
-            `<div class=orderM>
+      i++;
+    }
+  } else {
+    $(".orderList").append(
+      `<div class=orderM>
                 <p>Er zijn geen bijbehorende orders gevonden</p>
             </div>`
-        );
-    }
+    );
+  }
 };
 
 //VV Beta functions VV
-
 
 // Returns EDI orders
 // getEdi = email => {
@@ -153,7 +156,7 @@ createOrderList = (clientData, data) => {
 //             "Content-Type": "application/json",
 //             "Authorization": `Bearer <%= iparam.a2 %>`
 //     }}
-    
+
 //     client.request[method](url, options).then(function (data) {
 //         parsedResponseE = JSON.parse(data.response);
 //         console.log(parsedResponseE)
@@ -163,7 +166,4 @@ createOrderList = (clientData, data) => {
 
 // Prints the orderdetails in a HTML template
 
-
 // End of script
-
-
